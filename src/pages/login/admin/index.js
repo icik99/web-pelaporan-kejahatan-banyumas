@@ -1,5 +1,9 @@
+'use client';
+import PostLoginAdmin from '@/hooks/admin/PostLoginAdmin';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
+import Link from 'next/link';
 import React, { useState } from 'react'
+import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
@@ -12,9 +16,25 @@ export default function LoginAdmin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = (values) => {
-    // Lakukan sesuatu dengan nilai formulir yang telah divalidasi
-    console.log(values);
+  const { mutate: login } = PostLoginAdmin({
+    onSuccess: (data) => {
+      toast.success('berhasil')
+      console.log(data)
+    },
+    onError: (error) => {
+      toast.error('gagal')
+      console.log(error)
+    },
+  });
+
+  const handleSubmit = async (values) => {
+    try {
+      await login(values)
+      console.log(values);
+    } catch (error) {
+      console.log(error)
+    }
+    
   };
 
   return (
