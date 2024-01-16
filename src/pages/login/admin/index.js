@@ -1,7 +1,10 @@
 'use client';
-import PostLoginAdmin from '@/hooks/admin/PostLoginAdmin';
+import PostLoginAdmin from '@/pages/hooks/admin/PostLoginAdmin';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
@@ -12,29 +15,34 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function LoginAdmin() {
-
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-
-  const { mutate: login } = PostLoginAdmin({
-    onSuccess: (data) => {
-      toast.success('berhasil')
-      console.log(data)
-    },
-    onError: (error) => {
-      toast.error('gagal')
-      console.log(error)
-    },
-  });
+  const router = useRouter()
+  // const { mutate: login } = PostLoginAdmin({
+  //   onSuccess: (data) => {
+  //     console.log(data, 'response')
+  //     localStorage.setItem('token', data.accessToken)
+  //     router.push('/admin/dashboard')
+  //     toast.success('Success Login!')
+  //   },
+  //   onError: (error) => {
+  //     toast.error('Failed Login!')
+  //     console.log(error)
+  //   },
+  // });
 
   const handleSubmit = async (values) => {
     try {
-      await login(values)
-      console.log(values);
+      const response = await axios.post('http://localhost:5000/login', values);
+      localStorage.setItem('token', response.data.accessToken)
+      router.push('/admin/dashboard');
+      toast.success('Success Login!');
     } catch (error) {
       console.log(error)
+      if (error.response.status === 401) {
+        toast.error('Invalid username or password')
+      } else {
+        toast.error('Failed Login!')
+      }
     }
-    
   };
 
   return (

@@ -1,6 +1,9 @@
+import axios from 'axios';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react'
+import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
@@ -10,12 +13,23 @@ const validationSchema = Yup.object().shape({
 
 export default function LoginPelapor() {
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const router = useRouter()
 
-  const handleSubmit = (values) => {
-    // Lakukan sesuatu dengan nilai formulir yang telah divalidasi
-    console.log(values);
+
+  const handleSubmit = async (values) => {
+    try {
+      const response = await axios.post('http://localhost:5000/login', values);
+      localStorage.setItem('token', response.data.accessToken)
+      router.push('/status-laporan');
+      toast.success('Success Login!');
+    } catch (error) {
+      console.log(error)
+      if (error.response.status === 401) {
+        toast.error('Invalid username or password')
+      } else {
+        toast.error('Failed Login!')
+      }
+    }
   };
 
   return (

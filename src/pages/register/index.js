@@ -2,22 +2,31 @@ import React, { useState } from 'react'
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import Link from 'next/link';
 import * as Yup from 'yup';
+import api from '../api/hello';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required('Username harus diisi'),
   email: Yup.string().email('Email harus valid').required('Email harus diisi'),
   password: Yup.string().required('Password harus diisi'),
+  name: Yup.string().required('Name harus diisi'),
+
 });
 
 export default function RegisterPelapor() {
 
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [email, setEmail] = useState('')
+    const route = useRouter()
 
-    const handleSubmit = (values) => {
-        // Lakukan sesuatu dengan nilai formulir yang telah divalidasi
+    const handleSubmit = async (values) => {
+        try {
+          const res = await api.Register(values)
+          toast.success('Sukses Create Akun')
+          route.push("/login/pelapor")
+        } catch (error) {
+          console.log(error)
+        }
         console.log(values);
     };
 
@@ -27,11 +36,16 @@ export default function RegisterPelapor() {
         <h1 className="text-center text-black text-[58px] font-normal mb-[32px]">Create Account</h1>
         <div>
           <Formik
-            initialValues={{ username: '', password: '' , email: ''}}
+            initialValues={{ username: '', name: '', password: '' , email: ''}}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             <Form>
+              <div className='mb-[34px]'>
+                <h1 className="text-black text-[35px] font-normal mb-[16px]">Name</h1>
+                <Field type="text" name="name" className="rounded-[25px] py-[18px] px-[23px] w-full text-[25px]" placeHolder="Enter name"/> 
+                <ErrorMessage name="name" component="div" className="text-red-500 text-lg pl-3" />
+              </div>
               <div className='mb-[34px]'>
                 <h1 className="text-black text-[35px] font-normal mb-[16px]">Email</h1>
                 <Field type="text" name="email" className="rounded-[25px] py-[18px] px-[23px] w-full text-[25px]" placeHolder="Enter Email"/> 
