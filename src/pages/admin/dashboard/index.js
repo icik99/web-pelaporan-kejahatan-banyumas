@@ -1,8 +1,11 @@
 import api from '@/pages/api/hello';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export default function DashboardAdmin() {
   const [dataHeader, setDataHeader] = useState('')
+  const [dataFetch, setDataFetch] = useState('')
+  const route = useRouter()
 
   const getDataHeader = async () => {
     try {
@@ -14,8 +17,23 @@ export default function DashboardAdmin() {
     }
   }
 
+  const getDataFetch = async () => {
+    try {
+      const res = await api.GetFetch(localStorage.getItem('token'))
+      console.log(res, 'response fetch')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // if (!dataFetch){
+  //   route.push('/')
+  //   localStorage.removeItem('token')
+  // }
+
   useEffect(() => {
     getDataHeader()
+    getDataFetch()
   }, [])
   
 

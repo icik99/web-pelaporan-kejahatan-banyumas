@@ -11,7 +11,17 @@ class api {
             data
         })
     }
-    
+    // Fetch User
+    static GetFetch(token) {
+      let path = `fetch`;
+      return request(`${this.urlAPI()}${path}`, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      })
+    }
+
     static GetJenisKejahatan(token) {
       let path = `kejahatan`;
       return request(`${this.urlAPI()}${path}`, {
